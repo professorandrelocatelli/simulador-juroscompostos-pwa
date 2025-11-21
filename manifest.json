@@ -1,0 +1,21 @@
+{
+  "name": "Simulador de Juros Compostos",
+  "short_name": "Simulador JC",
+  "description": "Calculadora Financeira Completa para Juros Compostos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#3c0c6b",
+  "theme_color": "#4B0082",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

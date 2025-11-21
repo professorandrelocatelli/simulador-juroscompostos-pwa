@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Juros Compostos - Acesso Restrito</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4B0082"/>
+    
+    <style>
+        /* Estilos Base e Cores Institucionais */
+        body {
+            background-color: #3c0c6b; /* Roxo Escuro Principal */
+            color: #f0f0f0; /* Branco Suave */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* HEADER */
+        header {
+            width: 100%;
+            padding: 20px 20px 0;
+            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center;
+        }
+        
+        #logomarca {
+            max-width: 250px; 
+            height: auto;
+            margin-bottom: 10px; 
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em; 
+            color: #ffc107; /* Amarelo Secundário */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        /* ÁREAS DE CONTEÚDO (LOGIN E SIMULADOR) */
+        #area_login, #simulador_completo {
+            background-color: rgba(255, 255, 255, 0.1); /* Fundo semi-transparente */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            max-width: 600px; 
+            width: 90%;
+            margin-top: 240px; 
+            margin-bottom: 20px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #simulador_completo {
+            display: none; 
+            margin-top: 180px; 
+        }
+
+        /* TÍTULOS E TEXTOS */
+        #area_login h2, #simulador_completo h2 {
+            color: #ffc107;
+            border-bottom: 2px solid #5a1e8a; /* Linha de destaque */
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* CAMPOS DE INPUT */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+        
+        .input-group input[type="number"], .input-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #3c0c6b;
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        /* Efeito Foco para melhor UX */
+        .input-group input[type="number"]:focus, .input-group input[type="text"]:focus {
+            border-color: #ffc107;
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+            outline: none;
+        }
+
+        /* Campo de Senha */
+        #area_login input[type="password"] {
+            width: 100%; 
+            padding: 15px; 
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            box-sizing: border-box;
+            font-size: 1.1em;
+            background-color: #f0f0f0;
+            color: #333; 
+        }
+
+        /* Botões */
+        button { 
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0 5px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s;
+        }
+
+        #btn-calcular { 
+            background-color: #ffc107; /* Amarelo */
+            color: #3c0c6b;
+            font-size: 1.3em;
+        }
+        
+        #btn-calcular:hover { background-color: #e0a800; }
+        
+        #area_login button[type="submit"] {
+            background-color: #5a1e8a; /* Roxo de Ação */
+            color: white;
+            font-size: 1.2em;
+        }
+        #area_login button[type="submit"]:hover { background-color: #4b1974; }
+
+
+        /* Área de Resultados */
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1.1em;
+            border-left: 5px solid #ffc107; /* Linha de destaque para resultados */
+        }
+        
+        #resultado h2 {
+            font-size: 1.4em;
+            color: #f0f0f0; 
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 10px;
+        }
+
+        #resultado p {
+            margin: 8px 0;
+        }
+
+        #resultado strong {
+            color: #ffc107;
+        }
+        
+        /* Rodapé */
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.7);
+            position: fixed; 
+            bottom: 0;
+            background-color: rgba(60, 12, 107, 0.8); 
+            backdrop-filter: blur(2px);
+        }
+    </style>
+</head>
+<body>
+    
+    <header>
+        <img id="logomarca" src="https://i.postimg.cc/hts7kNH5/Com-Professor-Andre-Locatelli-(1).png" alt="Logomarca do Simulador">
+        <h1>SIMULADOR DE JUROS COMPOSTOS</h1>
+    </header>
+
+    <div id="area_login">
+        <h2>🔒 ACESSO RESTRITO</h2>
+        <p>Insira a sua senha para continuar:</p>
+        
+        <form onsubmit="verificarAcesso(); return false;">
+            <input type="password" id="senha" placeholder="Digite a Senha Secreta" required>
+            <button type="submit">ENTRAR NO SIMULADOR</button>
+        </form>
+    </div>
+
+    <div id="simulador_completo">
+        
+        <h2>Cálculo Financeiro Completo</h2>
+        <p>Preencha **quatro dos cinco campos** e deixe em branco o valor que deseja calcular (Capital, Aporte, Taxa, Tempo ou Montante).</p>
+
+        <form id="form-unico">
+            
+            <div class="input-group">
+                <label for="capital">1. Capital Inicial (R$):</label>
+                <input type="number" id="capital" value="1000" min="0" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label for="aporte">2. Aporte Mensal (R$):</label>
+                <input type="number" id="aporte" value="" min="0" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label for="taxa">3. Taxa de Juros (ao mês, em %):</label>
+                <input type="number" id="taxa" value="1.0" min="0" step="0.01">
+            </div>
+            
+            <div class="input-group">
+                <label for="tempo">4. Período de Tempo (em meses):</label>
+                <input type="number" id="tempo" value="12" min="1" step="1">
+            </div>
+            
+             <div class="input-group">
+                <label for="montante">5. Montante Final (R$):</label>
+                <input type="number" id="montante" value="3848.33" min="0" step="0.01">
+            </div>
+
+            <button type="button" id="btn-calcular" onclick="calcularTudo()">CALCULAR</button>
+        </form>
+        
+        <div id="resultado">
+            <p>Deixe o campo que você deseja descobrir em branco e clique em CALCULAR.</p>
+        </div>
+    </div>
+
+    <script>
+        // Senha para Acesso Restrito
+        const SENHA_CORRETA = "1979"; 
+
+        function verificarAcesso() {
+            const campoSenha = document.getElementById('senha');
+            const senhaDigitada = campoSenha.value.trim();
+            
+            if (senhaDigitada === SENHA_CORRETA) {
+                document.getElementById('area_login').style.display = 'none';
+                document.getElementById('simulador_completo').style.display = 'block';
+                campoSenha.value = '';
+            } else {
+                alert('Senha incorreta! Tente novamente.');
+                campoSenha.value = '';
+                campoSenha.focus();
+            }
+        }
+        
+        document.querySelector('#area_login form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            verificarAcesso();
+        });
+
+        // ----------------------------------------------------
+        // FUNÇÕES MATEMÁTICAS ESSENCIAIS
+        // ----------------------------------------------------
+        
+        /** Calcula o Montante (M) dados C, A, i, t. */
+        function calcularM(C, A, i, t) {
+            const montanteCapital = C * Math.pow((1 + i), t);
+            
+            let montanteAportes = 0;
+            if (A > 0 && i > 0) { 
+                 montanteAportes = A * ((Math.pow((1 + i), t) - 1) / i);
+            } else if (i === 0) {
+                 montanteAportes = A * t;
+            }
+            
+            return montanteCapital + montanteAportes;
+        }
+
+        /** Calcula o Capital Inicial (C) dados M, A, i, t. */
+        function calcularC(M, A, i, t) {
+            const fatorMontante = Math.pow((1 + i), t);
+            
+            let montanteAportes = 0;
+            if (A > 0 && i > 0) {
+                 montanteAportes = A * ((Math.pow((1 + i), t) - 1) / i);
+            } else if (i === 0) {
+                 montanteAportes = A * t;
+            }
+
+            return (M - montanteAportes) / fatorMontante; 
+        }
+
+        /** Calcula a Taxa de Juros (i) usando Busca Binária. */
+        function taxaJurosIterativa(C, A, t, M) {
+            if (A === 0) {
+                if (M <= C) return 0;
+                return Math.pow((M / C), (1 / t)) - 1;
+            }
+
+            let minRate = 0.0000001; 
+            let maxRate = 5.0;       
+            const tolerance = 0.000001; 
+            const maxIterations = 100;
+
+            for (let k = 0; k < maxIterations; k++) {
+                let midRate = (minRate + maxRate) / 2;
+                let M_guess = calcularM(C, A, midRate, t);
+                
+                if (Math.abs(M_guess - M) < tolerance) {
+                    return midRate;
+                }
+                
+                if (M_guess < M) {
+                    minRate = midRate;
+                } else {
+                    maxRate = midRate;
+                }
+
+                if (maxRate - minRate < tolerance) {
+                    return midRate;
+                }
+            }
+            return null;
+        }
+
+        /** Calcula o Período de Tempo (t) dados C, A, i, M. */
+        function calcularTempo(C, A, i, M) {
+            if (i === 0) {
+                if (A === 0) return (M === C) ? 0 : NaN;
+                return (M - C) / A;
+            }
+            
+            if (M <= C && A <= 0) {
+                return NaN;
+            }
+
+            const numerador_log = (M * i) + A;
+            const denominador_log = (C * i) + A;
+            
+            if (numerador_log <= 0 || denominador_log <= 0) {
+                return NaN;
+            }
+            
+            const numerador = Math.log(numerador_log / denominador_log);
+            const denominador = Math.log(1 + i);
+            
+            return numerador / denominador;
+        }
+        
+        /** Calcula o Aporte Mensal (A) dados C, M, i, t. */
+        function calcularAporte(C, M, i, t) {
+            if (t <= 0) return NaN;
+            
+            if (i === 0) {
+                return (M - C) / t;
+            }
+
+            const montanteCapital = C * Math.pow((1 + i), t);
+            const fatorAnuidade = (Math.pow((1 + i), t) - 1) / i;
+            
+            return (M - montanteCapital) / fatorAnuidade;
+        }
+
+        
+        // ----------------------------------------------------
+        // FUNÇÃO CENTRAL: CALCULAR TUDO
+        // ----------------------------------------------------
+        function calcularTudo() {
+            const inputs = {
+                capital: document.getElementById('capital'),
+                aporte: document.getElementById('aporte'),
+                taxa: document.getElementById('taxa'),
+                tempo: document.getElementById('tempo'),
+                montante: document.getElementById('montante')
+            };
+
+            const campoVazio = Object.keys(inputs).filter(key => inputs[key].value === "" || inputs[key].value === null);
+            const resultadoDiv = document.getElementById('resultado');
+
+            if (campoVazio.length !== 1) {
+                resultadoDiv.innerHTML = '<h2>🛑 Erro</h2><p>Por favor, preencha **quatro dos cinco campos** e deixe **apenas um em branco** para calcularmos o valor.</p>';
+                return;
+            }
+            
+            // 2. Coletar valores
+            const C_val = parseFloat(inputs.capital.value) || 0;
+            const A_val = parseFloat(inputs.aporte.value) || 0;
+            const i_percent = parseFloat(inputs.taxa.value) || 0;
+            const t_val = parseInt(inputs.tempo.value) || 0;
+            const M_val = parseFloat(inputs.montante.value) || 0;
+
+            const i = i_percent / 100;
+            
+            // 3. Executar o cálculo apropriado
+            let valorCalculado = null;
+            let campoResultado = '';
+            let tipoCalculo = ''; 
+
+            switch (campoVazio[0]) {
+                case 'montante':
+                    valorCalculado = calcularM(C_val, A_val, i, t_val);
+                    campoResultado = 'Montante Final ($M$)';
+                    tipoCalculo = 'Montante Final';
+                    break;
+
+                case 'capital':
+                    valorCalculado = calcularC(M_val, A_val, i, t_val);
+                    campoResultado = 'Capital Inicial ($C$)';
+                    tipoCalculo = 'Capital Inicial';
+                    
+                    if (valorCalculado < 0) {
+                         resultadoDiv.innerHTML = '<h2>🚫 Impossível</h2><p>O Montante Desejado (R$ ' + M_val.toFixed(2).replace('.', ',') + ') é atingível apenas com os aportes mensais. Capital Inicial não é necessário.</p>';
+                         return;
+                    }
+                    break;
+                
+                case 'taxa':
+                    const totalInvestidoTaxa = C_val + (A_val * t_val);
+                    if (totalInvestidoTaxa >= M_val) {
+                        valorCalculado = 0; 
+                    } else {
+                        valorCalculado = taxaJurosIterativa(C_val, A_val, t_val, M_val);
+                        if (valorCalculado === null) {
+                            resultadoDiv.innerHTML = '<h2>⚠️ Erro</h2><p>A Taxa de Juros não pôde ser convergida. Verifique seus dados.</p>';
+                            return;
+                        }
+                    }
+                    campoResultado = 'Taxa de Juros (ao mês)';
+                    tipoCalculo = 'Taxa de Juros';
+                    break;
+
+                case 'tempo':
+                    valorCalculado = calcularTempo(C_val, A_val, i, M_val);
+                    
+                    if (isNaN(valorCalculado) || valorCalculado <= 0) {
+                         resultadoDiv.innerHTML = '<h2>🚫 Impossível</h2><p>O Montante Desejado não pode ser atingido (tempo seria zero ou negativo).</p>';
+                        return;
+                    }
+                    
+                    campoResultado = 'Período de Tempo (meses)';
+                    tipoCalculo = 'Período de Tempo';
+                    break;
+
+
+                case 'aporte':
+                    valorCalculado = calcularAporte(C_val, M_val, i, t_val);
+
+                    if (valorCalculado < 0) {
+                        resultadoDiv.innerHTML = '<h2>🚫 Impossível</h2><p>O Montante Desejado pode ser atingido ou ultrapassado apenas com o Capital Inicial. O aporte mensal seria negativo.</p>';
+                        return;
+                    } else if (isNaN(valorCalculado) || t_val === 0) {
+                        resultadoDiv.innerHTML = '<h2>🛑 Erro</h2><p>Não é possível calcular o Aporte. Verifique se o Tempo é zero.</p>';
+                        return;
+                    }
+                    
+                    campoResultado = 'Aporte Mensal ($A$)';
+                    tipoCalculo = 'Aporte Mensal';
+                    break;
+
+                default:
+                    resultadoDiv.innerHTML = '<h2>🛑 Erro</h2><p>Erro interno.</p>';
+                    return;
+            }
+            
+            // 4. Exibir o resultado
+            if (valorCalculado !== null) {
+                
+                // Definir os valores finais para o cálculo de detalhes
+                let C_final = (campoVazio[0] === 'capital') ? valorCalculado : C_val;
+                let M_final = (campoVazio[0] === 'montante') ? valorCalculado : M_val;
+                let i_final = (campoVazio[0] === 'taxa') ? valorCalculado : i;
+                let A_final = (campoVazio[0] === 'aporte') ? valorCalculado : A_val;
+                let t_final = (campoVazio[0] === 'tempo') ? valorCalculado : t_val;
+
+                // Para o cálculo de juros, usamos M, C, e A*t do cenário final.
+                const totalInvestido = C_final + (A_final * t_final);
+                const juros = M_final - totalInvestido;
+                
+                // Formatação
+                let valorFormatado;
+                let valorParaInput = valorCalculado.toFixed(2);
+
+                if (campoVazio[0] === 'taxa') {
+                    valorFormatado = (valorCalculado * 100).toFixed(4) + '%';
+                    valorParaInput = (valorCalculado * 100).toFixed(4);
+                } else if (campoVazio[0] === 'tempo') {
+                    valorFormatado = valorCalculado.toFixed(2) + ' meses';
+                    valorParaInput = valorCalculado.toFixed(2);
+                } else {
+                    valorFormatado = 'R$ ' + valorCalculado.toFixed(2).replace('.', ',');
+                }
+                
+                // Atualiza o campo calculado na interface
+                inputs[campoVazio[0]].value = valorParaInput;
+
+
+                resultadoDiv.innerHTML = `
+                    <h2>✅ Resultado: ${tipoCalculo}</h2>
+                    <p>Valor Calculado (${campoResultado}): <strong>${valorFormatado}</strong></p>
+                    <hr style="border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 10px 0;">
+                    <p>Total Investido (C + Aportes): <strong>R$ ${totalInvestido.toFixed(2).replace('.', ',')}</strong></p>
+                    <p>Total em Juros Ganhos: <strong>R$ ${juros.toFixed(2).replace('.', ',')}</strong></p>
+                    <p>Montante Final: <strong>R$ ${M_final.toFixed(2).replace('.', ',')}</strong></p>
+                `;
+            }
+        }
+    </script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(registration => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, function(err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+          });
+        }
+    </script>
+    
+    <footer>
+        <p>Criado por ANDRÉ AUGUSTO LOCATELLI</p>
+    </footer>
+
+</body>
+</html>
